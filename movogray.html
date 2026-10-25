@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мовограй — інтелектуальна гра про українську мову</title>
+  <style>
+    :root {
+      --blue: #0057b7;
+      --yellow: #ffd700;
+      --dark: #1a1a2e;
+      --card: #16213e;
+      --text: #eaeaea;
+      --green: #2ecc71;
+      --red: #e74c3c;
+      --accent: #00d2ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      background: linear-gradient(90deg, var(--blue), var(--yellow));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      color: #aaa;
+      font-size: 1.05rem;
+    }
+
+    .flag {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 20px;
+    }
+
+    .menu-btn {
+      display: block;
+      width: 100%;
+      padding: 16px 20px;
+      margin: 10px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      background: linear-gradient(135deg, #1e3a5f, #2a4a6f);
+      color: white;
+    }
+
+    .menu-btn:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, var(--blue), #0077cc);
+      box-shadow: 0 6px 20px rgba(0,87,183,0.4);
+    }
+
+    .menu-btn span {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      margin-right: 14px;
+      font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      font-size: 0.95rem;
+      color: #aaa;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--yellow));
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 24px;
+      line-height: 1.45;
+    }
+
+    .option {
+      display: block;
+      width: 100%;
+      padding: 14px 18px;
+      margin: 10px 0;
+      font-size: 1.05rem;
+      text-align: left;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: rgba(0,210,255,0.1);
+    }
+
+    .option.correct {
+      border-color: var(--green);
+      background: rgba(46,204,113,0.15);
+    }
+
+    .option.wrong {
+      border-color: var(--red);
+      background: rgba(231,76,60,0.15);
+    }
+
+    .option:disabled { cursor: default; opacity: 0.9; }
+
+    .explanation {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(0,210,255,0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      font-size: 0.98rem;
+    }
+
+    .score-panel {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .score-item {
+      background: rgba(255,255,255,0.06);
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .score-item .num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--yellow);
+    }
+
+    .btn {
+      padding: 14px 28px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue), #0077cc);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,87,183,0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.18);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .result-verdict {
+      font-size: 1.3rem;
+      text-align: center;
+      margin: 20px 0;
+      padding: 16px;
+      border-radius: 12px;
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(255,215,0,0.15);
+      color: var(--yellow);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    th { color: var(--yellow); font-weight: 600; }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 1.1rem;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.3);
+      color: white;
+      margin: 12px 0;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    @media (max-width: 500px) {
+      h1 { font-size: 1.8rem; }
+      .card { padding: 20px; }
+      .question-text { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ===== ГОЛОВНЕ МЕНЮ ===== -->
+    <div id="screen-menu">
+      <header>
+        <div class="flag">🇺🇦</div>
+        <h1>МОВОГРАЙ</h1>
+        <p class="subtitle">Інтелектуальна гра про українську мову</p>
+      </header>
+
+      <div class="card">
+        <button class="menu-btn" onclick="startGame(null)">
+          <span>1</span> Грати (змішаний режим)
+        </button>
+        <button class="menu-btn" onclick="showCategories()">
+          <span>2</span> Обрати категорію
+        </button>
+        <button class="menu-btn" onclick="showHighscores()">
+          <span>3</span> Таблиця рекордів
+        </button>
+        <button class="menu-btn" onclick="showRules()">
+          <span>4</span> Правила гри
+        </button>
+        <button class="menu-btn" onclick="showAbout()">
+          <span>5</span> Про гру
+        </button>
+      </div>
+
+      <div class="footer">
+        Створено з любов’ю до української мови 💙💛
+      </div>
+    </div>
+
+    <!-- ===== ВИБІР КАТЕГОРІЇ ===== -->
+    <div id="screen-categories" class="hidden">
+      <header>
+        <h1>Оберіть категорію</h1>
+      </header>
+      <div class="card" id="category-list"></div>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="showScreen('menu')">← Назад</button>
+      </div>
+    </div>
+
+    <!-- ===== ГРА ===== -->
+    <div id="screen-game" class="hidden">
+      <div class="score-panel">
+        <div class="score-item">
+          <div class="num" id="live-score">0</div>
+          <div>Бали</div>
+        </div>
+        <div class="score-item">
+          <div class="num" id="live-streak">0</div>
+          <div>Серія</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="question-header">
+          <span id="q-counter">Питання 1/10</span>
+          <span id="q-category" class="category-badge"></span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress" style="width: 0%"></div>
+        </div>
+        <div class="question-text" id="q-text"></div>
+        <div id="options"></div>
+        <div id="explanation" class="explanation hidden"></div>
+        <div class="btn-group">
+          <button class="btn btn-primary hidden" id="next-btn" onclick="nextQuestion()">Далі →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== РЕЗУЛЬТАТ ===== -->
+    <div id="screen-result" class="hidden">
+      <header>
+        <h1>Результат гри</h1>
+      </header>
+      <div class="card">
+        <div id="result-content"></div>
+        <div id="save-section">
+          <p style="margin-top:20px; text-align:center;">Зберегти результат?</p>
+          <input type="text" id="player-name" placeholder="Ваше ім’я або нік" maxlength="20">
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="saveScore()">Зберегти</button>
+            <button class="btn btn-secondary" onclick="showScreen('menu')">В меню</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== РЕКОРДИ ===== -->
+    <div id="screen-scores" class="hidden">
+      <header>
+        <h1>🏆 Таблиця рекордів</h1>
+      </header>
+      <div class="card">
+        <div id="scores-table"></div>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="showScreen('menu')">← Назад</button>
+          <button class="btn btn-secondary" onclick="clearScores()">Очистити</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ПРАВИЛА ===== -->
+    <div id="screen-rules" class="hidden">
+      <header>
+        <h1>📜 Правила</h1>
+      </header>
+      <div class="card">
+        <p style="margin-bottom:14px;">У кожній грі вам пропонується <strong>10 питань</strong>.</p>
+        <p style="margin-bottom:14px;">На кожне питання є <strong>4 варіанти</strong> відповіді. Оберіть правильний.</p>
+        <p style="margin-bottom:14px;">За правильну відповідь — <strong style="color:var(--green)">+1 бал</strong>.</p>
+        <p style="margin-bottom:14px;">За серію з 3+ правильних відповідей підряд — <strong style="color:var(--yellow)">бонусні бали</strong>.</p>
+        <p style="margin-bottom:14px;">Після кожного питання з’являється коротке пояснення.</p>
+        <p>Мета — краще пізнати багату і прекрасну українську мову!</p>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="showScreen('menu')">← Назад</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ПРО ГРУ ===== -->
+    <div id="screen-about" class="hidden">
+      <header>
+        <h1>ℹ️ Про гру</h1>
+      </header>
+      <div class="card">
+        <p style="margin-bottom:14px;"><strong>Мовограй</strong> — інтелектуальна вікторина, створена, щоб відкривати красу, глибину та унікальність української мови.</p>
+        <p style="margin-bottom:10px;"><strong>Категорії:</strong></p>
+        <ul style="margin-left:20px; margin-bottom:16px;">
+          <li>Орфографія та правопис</li>
+          <li>Граматика</li>
+          <li>Лексика та словотворення</li>
+          <li>Фразеологізми</li>
+          <li>Література</li>
+          <li>Історія української мови</li>
+        </ul>
+        <p>72 питання • Працює офлайн • Без встановлення</p>
+        <p style="margin-top:16px; color:#aaa;">Створено з любов’ю до української мови 💙💛</p>
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="showScreen('menu')">← Назад</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===================== БАЗА ПИТАНЬ =====================
+    const QUESTIONS = {
+      "орфографія": [
+        { q: "Яка літера є унікальною для української абетки серед інших слов’янських мов?", options: ["Ґ", "Ї", "Є", "І"], answer: 1, explanation: "Літера «Ї» є унікальним символом української абетки. Їй навіть встановлено пам’ятники." },
+        { q: "Скільки літер у сучасній українській абетці?", options: ["32", "33", "34", "31"], answer: 1, explanation: "Українська абетка складається з 33 літер." },
+        { q: "Яка літера найрідше зустрічається на початку власне українських слів?", options: ["Ф", "Ґ", "Щ", "Х"], answer: 0, explanation: "Літера «Ф» майже не зустрічається на початку питомо українських слів (крім кількох, як-от «Федір», «фе»)." },
+        { q: "Яка літера починає найбільшу кількість слів в українській мові?", options: ["С", "П", "К", "Б"], answer: 1, explanation: "Найбільше слів починається на літеру «П»." },
+        { q: "Як правильно написати: «з’їсти» чи «зїсти»?", options: ["зїсти", "з’їсти", "з-їсти", "з їсти"], answer: 1, explanation: "Апостроф ставиться перед я, ю, є, ї після префіксів, що закінчуються на приголосний." },
+        { q: "У якому випадку пишеться подвоєння приголосних?", options: ["завжди в іншомовних словах", "у словах на -ння, -ття тощо", "ніколи", "тільки в прізвищах"], answer: 1, explanation: "Подвоєння характерне для слів на -ння, -ття, -лля та деяких інших (знання, життя, гілля)." },
+        { q: "Як правильно: «на протязі тижня» чи «упродовж тижня»?", options: ["на протязі тижня", "упродовж тижня", "обидва правильні", "протягом тижня (лише)"], answer: 1, explanation: "Правильно: упродовж / протягом. «На протязі» — калька з російської." },
+        { q: "Яке написання правильне?", options: ["пів яблука", "пів’яблука", "пів-яблука", "півяблука"], answer: 1, explanation: "Згідно з чинним правописом: пів’яблука (з апострофом)." },
+        { q: "Як правильно написати назву міста?", options: ["Івано-Франківськ", "Іванофранківськ", "Івано Франківськ", "Івано-франківськ"], answer: 0, explanation: "Складні географічні назви пишуться через дефіс: Івано-Франківськ." },
+        { q: "У слові «серце» скільки звуків?", options: ["5", "4", "6", "3"], answer: 1, explanation: "с-е-р-ц-е → 5 літер, але 4 звуки (ц = [ц])." },
+        { q: "Який правописний принцип є основним в українській орфографії?", options: ["Лише фонетичний", "Фонетичний + морфологічний", "Лише історичний", "Лише морфологічний"], answer: 1, explanation: "Українська орфографія базується переважно на фонетичному та морфологічному принципах." },
+        { q: "Як правильно написати?", options: ["вч итель", "вчитель", "вчітель", "вчит ель"], answer: 1, explanation: "Правильно: вчитель." }
+      ],
+      "граматика": [
+        { q: "Скільки відмінків має іменник в українській мові?", options: ["6", "7", "5", "8"], answer: 1, explanation: "Сім відмінків: називний, родовий, давальний, знахідний, орудний, місцевий і кличний." },
+        { q: "Який відмінок є унікальним для української мови серед східнослов’янських?", options: ["Місцевий", "Кличний", "Орудний", "Давальний"], answer: 1, explanation: "Кличний відмінок активно функціонує в українській мові (друже, сестро, Україно)." },
+        { q: "Поставте слово «юнак» у кличний відмінок:", options: ["юнаку", "юначе", "юнак", "юнакові"], answer: 1, explanation: "Правильна форма кличного відмінка: юначе." },
+        { q: "Яка форма правильна?", options: ["різка біль", "різкий біль", "різка біль", "різке біль"], answer: 1, explanation: "Біль — іменник чоловічого роду, тому: різкий біль." },
+        { q: "Скільки родів має іменник в українській мові?", options: ["2", "3", "4", "1"], answer: 1, explanation: "Три роди: чоловічий, жіночий, середній." },
+        { q: "Форма «робитиму» — це:", options: ["Минулий час", "Майбутній час (простий)", "Наказовий спосіб", "Умовний спосіб"], answer: 1, explanation: "Це форма простого майбутнього часу (робитиму = буду робити)." },
+        { q: "Що таке «дієприкметник»?", options: ["Особлива форма дієслова", "Вид прикметника", "Прислівник", "Сполучник"], answer: 0, explanation: "Дієприкметник — особлива форма дієслова, що має ознаки і дієслова, і прикметника." },
+        { q: "У реченні «Книга лежить на столі» слово «на столі» — це:", options: ["Додаток", "Обставина місця", "Означення", "Підмет"], answer: 1, explanation: "«На столі» — обставина місця." },
+        { q: "Яка частина мови відповідає на питання «який?», «чия?», «котрий?»?", options: ["Іменник", "Прикметник", "Прислівник", "Числівник"], answer: 1, explanation: "Прикметник." },
+        { q: "Скільки основних типів відмінювання іменників в українській мові?", options: ["2", "3", "4", "5"], answer: 2, explanation: "Чотири відміни іменників." },
+        { q: "Яке речення є безособовим?", options: ["Сонце світить", "Мені холодно", "Діти грають", "Він читає"], answer: 1, explanation: "«Мені холодно» — безособове речення." },
+        { q: "Який час дієслова відсутній в українській мові?", options: ["Минулий", "Майбутній", "Теперішній", "Усі присутні"], answer: 3, explanation: "В українській мові є всі три основні часи." }
+      ],
+      "лексика": [
+        { q: "Скільки приблизно слів налічує сучасна українська мова?", options: ["близько 100 тисяч", "близько 256 тисяч", "близько 500 тисяч", "близько 80 тисяч"], answer: 1, explanation: "За даними словників — близько 256 тисяч слів." },
+        { q: "Яке слово має найбільше синонімів в українській мові?", options: ["ходити", "бити", "говорити", "дивитися"], answer: 1, explanation: "Слово «бити» має понад 45 синонімів." },
+        { q: "Скільки синонімів має слово «горизонт»?", options: ["близько 5", "близько 12", "близько 3", "близько 20"], answer: 1, explanation: "Обрій, небокрай, овид, крайнебо, виднокруг тощо — понад 12." },
+        { q: "Яка мова лексично найближча до української?", options: ["російська", "білоруська", "польська", "словацька"], answer: 1, explanation: "Білоруська має близько 84% спільної лексики з українською." },
+        { q: "Що означає слово «овид»?", options: ["вид згори", "горизонт", "пейзаж", "далечінь"], answer: 1, explanation: "Овид — один із синонімів до слова «горизонт»." },
+        { q: "Що означає діалектне слово «вивірка»?", options: ["птах", "білка", "куниця", "заєць"], answer: 1, explanation: "Вивірка — діалектна назва білки." },
+        { q: "Що означає слово «легінь»?", options: ["старий чоловік", "гарний юнак", "воїн", "пастух"], answer: 1, explanation: "Легінь — гарний, ставний хлопець, юнак (переважно в західних говорах)." },
+        { q: "Який відсоток запозичень в українській мові вважається відносно невеликим?", options: ["близько 10%", "близько 30%", "близько 50%", "близько 70%"], answer: 0, explanation: "Українська має відносно мало запозичень — близько 10%." },
+        { q: "Яке з цих слів є питомо українським?", options: ["комп’ютер", "телефон", "мрія", "інтернет"], answer: 2, explanation: "«Мрія» — питоме українське слово." },
+        { q: "Що означає «гринджоли»?", options: ["сани", "віз", "човен", "сани-полози"], answer: 0, explanation: "Гринджоли — діалектна назва саней." },
+        { q: "Яке слово є паліндромом?", options: ["мова", "ротатор", "книга", "слово"], answer: 1, explanation: "«Ротатор» читається однаково зліва направо і справа наліво." },
+        { q: "Найдовше слово в українській мові (хімічна назва) має приблизно:", options: ["15 літер", "20 літер", "30+ літер", "10 літер"], answer: 2, explanation: "Дихлордифенілтрихлорметилметан та подібні мають понад 30 літер." }
+      ],
+      "фразеологізми": [
+        { q: "Що означає фразеологізм «тримати язик за зубами»?", options: ["мовчати, бути стриманим", "швидко говорити", "кричати", "співати"], answer: 0, explanation: "Означає мовчати, не розголошувати таємниць, бути обачним у розмовах." },
+        { q: "Що означає «зробити з мухи слона»?", options: ["зменшити проблему", "перебільшити", "нічого не робити", "працювати важко"], answer: 1, explanation: "Перебільшувати щось незначне." },
+        { q: "Що означає «байдики бити»?", options: ["важко працювати", "ледарювати", "бити когось", "грати в ігри"], answer: 1, explanation: "Байдики бити = нічого не робити, ледарювати." },
+        { q: "Що означає «пекти раків»?", options: ["готувати їжу", "червоніти від сорому", "злитися", "радіти"], answer: 1, explanation: "Пекти раків = червоніти від сорому або збентеження." },
+        { q: "Що означає «задирати носа»?", options: ["бути високим", "зазнаватися, бути пихатим", "нюхати повітря", "хворіти"], answer: 1, explanation: "Задирати носа = зазнаватися, поводитися пихато." },
+        { q: "Що означає вислів «вода на млин»?", options: ["допомога ворогу", "те, що сприяє чиїйсь справі", "небезпека", "марнування часу"], answer: 1, explanation: "Лити воду на чийсь млин = робити щось на користь комусь." },
+        { q: "Що означає «кинути оком»?", options: ["подивитися швидко", "образити", "закрити очі", "плакати"], answer: 0, explanation: "Кинути оком = швидко глянути, глянути мимохідь." },
+        { q: "Що означає «сидіти склавши руки»?", options: ["відпочивати зручно", "нічого не робити", "молитися", "чекати"], answer: 1, explanation: "Сидіти склавши руки = бездіяти, нічого не робити." },
+        { q: "Фразеологізм «на Cul світі» означає:", options: ["далеко", "дуже багато, надзвичайно", "близько", "мало"], answer: 1, explanation: "На Cul світі = дуже, надзвичайно (красивий, добрий тощо)." },
+        { q: "Що означає «вивести на чисту воду»?", options: ["помити", "викрити, розкрити правду", "напоїти", "спасти"], answer: 1, explanation: "Вивести на чисту воду = викрити чиїсь темні справи." },
+        { q: "«Тягнути кота за хвіст» означає:", options: ["мучити тварину", "затягувати справу, говорити довго й не по суті", "гратися", "бути жорстоким"], answer: 1, explanation: "Тягнути кота за хвіст = навмисно затягувати розмову або справу." },
+        { q: "Що означає «пекти раки»?", options: ["те саме, що «пекти раків»", "готувати", "інше значення", "помилка"], answer: 0, explanation: "Обидві форми вживаються; значення — червоніти." }
+      ],
+      "література": [
+        { q: "Хто вважається засновником нової української літературної мови?", options: ["Тарас Шевченко", "Іван Котляревський", "Іван Франко", "Леся Українка"], answer: 1, explanation: "Іван Котляревський зі своєю «Енеїдою» (1798) започаткував нову українську літературну мову." },
+        { q: "У якому році вийшла перша частина «Енеїди» Котляревського?", options: ["1798", "1840", "1860", "1769"], answer: 0, explanation: "1798 рік — рік появи першого видання «Енеїди»." },
+        { q: "Який твір Тараса Шевченка має найбільше перекладів?", options: ["Катерина", "Заповіт", "Гайдамаки", "Сон"], answer: 1, explanation: "«Заповіт» перекладено найбільшою кількістю мов світу." },
+        { q: "Хто написав «Лісову пісню»?", options: ["Леся Українка", "Ольга Кобилянська", "Марко Вовчок", "Іван Франко"], answer: 0, explanation: "«Лісова пісня» — драма-феєрія Лесі Українки." },
+        { q: "Який письменник є автором «Кайдашевої сім’ї»?", options: ["Іван Нечуй-Левицький", "Панас Мирний", "Михайло Коцюбинський", "Василь Стефаник"], answer: 0, explanation: "Іван Нечуй-Левицький." },
+        { q: "Хто написав «Тіні забутих предків»?", options: ["Михайло Коцюбинський", "Василь Стефаник", "Ольга Кобилянська", "Іван Франко"], answer: 0, explanation: "Михайло Коцюбинський." },
+        { q: "Який твір Івана Франка часто називають гімном праці?", options: ["Каменярі", "Мойсей", "Захар Беркут", "Украдене щастя"], answer: 0, explanation: "Поема «Каменярі»." },
+        { q: "Хто є автором збірки «Кобзар»?", options: ["Іван Франко", "Тарас Шевченко", "Леся Українка", "Пантелеймон Куліш"], answer: 1, explanation: "Тарас Шевченко." },
+        { q: "У якому столітті жив Григорій Сковорода?", options: ["XVI", "XVII", "XVIII", "XIX"], answer: 2, explanation: "Григорій Сковорода (1722–1794) — XVIII століття." },
+        { q: "Хто написав «Бояриню»?", options: ["Леся Українка", "Ольга Кобилянська", "Марко Вовчок", "Наталія Кобринська"], answer: 0, explanation: "Леся Українка." },
+        { q: "Який твір вважається першим українським історичним романом?", options: ["Чорна рада", "Захар Беркут", "Гайдамаки", "Тарас Бульба"], answer: 0, explanation: "«Чорна рада» Пантелеймона Куліша." },
+        { q: "Хто започаткував жанр соціально-психологічної прози?", options: ["Панас Мирний", "Іван Нечуй-Левицький", "Марко Вовчок", "Ольга Кобилянська"], answer: 0, explanation: "Панас Мирний («Хіба ревуть воли, як ясла повні?»)." }
+      ],
+      "історія": [
+        { q: "Коли з’явилися перші письмові згадки слів «мед» і «страва»?", options: ["448 рік", "988 рік", "1240 рік", "1798 рік"], answer: 0, explanation: "Візантійський історик Пріск Панійський зафіксував ці слова в 448 році." },
+        { q: "У якому році українську мову визнали однією з наймилозвучніших у Парижі?", options: ["1918", "1934", "1991", "1863"], answer: 1, explanation: "1934 рік — на лінгвістичному конкурсі в Парижі." },
+        { q: "Скільки основних наріч має українська мова?", options: ["2", "3", "4", "5"], answer: 1, explanation: "Три наріччя: північне, південно-східне та південно-західне." },
+        { q: "До якої групи мов належить українська?", options: ["західнослов’янська", "східнослов’янська", "південнослов’янська", "балтійська"], answer: 1, explanation: "Східнослов’янська група." },
+        { q: "Який документ 1863 року обмежував використання української мови?", options: ["Емський указ", "Валуєвський циркуляр", "Універсал", "Маніфест"], answer: 1, explanation: "Валуєвський циркуляр 1863 року." },
+        { q: "Що таке Емський указ?", options: ["дозвіл на українську мову", "заборона української мови 1876 року", "реформа правопису", "створення академії"], answer: 1, explanation: "Емський указ 1876 року ще більше обмежив українську мову." },
+        { q: "Коли українська мова отримала статус державної в Конституції?", options: ["1991", "1989", "1996", "2004"], answer: 2, explanation: "Статус державної закріплено в Конституції 1996 року (стаття 10)." },
+        { q: "Який правопис діє в Україні наразі?", options: ["Правопис 1928", "Правопис 1933", "Правопис 2019", "Правопис 1960"], answer: 2, explanation: "Чинний Український правопис 2019 року." },
+        { q: "Хто створив перший український «Буквар»?", options: ["Іван Федоров", "Петро Могила", "Мелетій Смотрицький", "Іван Котляревський"], answer: 0, explanation: "Іван Федоров видав «Буквар» у 1574 році." },
+        { q: "Як називалася українська мова до XIX століття найчастіше?", options: ["малоросійська", "руська", "козацька", "слов’янська"], answer: 1, explanation: "Найчастіше — «руська мова»." },
+        { q: "Скільки говорів виділяють в українській мові?", options: ["близько 5", "близько 15", "близько 30", "близько 50"], answer: 1, explanation: "Близько 15 говорів у межах трьох наріч." },
+        { q: "На конкурсі в Парижі 1934 року українську оцінили за:", options: ["тільки милозвучність", "мелодійність, лексику, фразеологію, синтаксис", "тільки кількість слів", "простоту вивчення"], answer: 1, explanation: "За комплексом критеріїв: фонетика, лексика, фразеологія, структура речення." }
+      ]
+    };
+
+    // Збираємо всі питання
+    const ALL_QUESTIONS = [];
+    for (const [cat, qs] of Object.entries(QUESTIONS)) {
+      qs.forEach(q => ALL_QUESTIONS.push({ ...q, category: cat }));
+    }
+
+    // ===================== СТАН ГРИ =====================
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let maxStreak = 0;
+    let bonus = 0;
+    let categoryName = "";
+    let answered = false;
+
+    const NUM_QUESTIONS = 10;
+
+    // ===================== ФУНКЦІЇ =====================
+    function showScreen(name) {
+      document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.add('hidden'));
+      document.getElementById('screen-' + name).classList.remove('hidden');
+    }
+
+    function showCategories() {
+      const list = document.getElementById('category-list');
+      list.innerHTML = '';
+      const cats = Object.keys(QUESTIONS);
+      cats.forEach((cat, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'menu-btn';
+        btn.innerHTML = `<span>${i + 1}</span> ${cat.charAt(0).toUpperCase() + cat.slice(1)}`;
+        btn.onclick = () => startGame(cat);
+        list.appendChild(btn);
+      });
+      showScreen('categories');
+    }
+
+    function startGame(cat) {
+      if (cat === null) {
+        currentQuestions = shuffle([...ALL_QUESTIONS]).slice(0, NUM_QUESTIONS);
+        categoryName = "Змішаний режим";
+      } else {
+        currentQuestions = shuffle([...QUESTIONS[cat]]).slice(0, Math.min(NUM_QUESTIONS, QUESTIONS[cat].length));
+        categoryName = cat.charAt(0).toUpperCase() + cat.slice(1);
+      }
+      currentIndex = 0;
+      score = 0;
+      streak = 0;
+      maxStreak = 0;
+      bonus = 0;
+      answered = false;
+      showScreen('game');
+      renderQuestion();
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function renderQuestion() {
+      answered = false;
+      const q = currentQuestions[currentIndex];
+      document.getElementById('q-counter').textContent = `Питання ${currentIndex + 1}/${currentQuestions.length}`;
+      document.getElementById('q-category').textContent = q.category ? q.category : categoryName;
+      document.getElementById('q-text').textContent = q.q;
+      document.getElementById('progress').style.width = `${((currentIndex) / currentQuestions.length) * 100}%`;
+      document.getElementById('live-score').textContent = score + bonus;
+      document.getElementById('live-streak').textContent = streak;
+      document.getElementById('explanation').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      const opts = document.getElementById('options');
+      opts.innerHTML = '';
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.textContent = `${i + 1}. ${opt}`;
+        btn.onclick = () => selectAnswer(i);
+        opts.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(index) {
+      if (answered) return;
+      answered = true;
+      const q = currentQuestions[currentIndex];
+      const buttons = document.querySelectorAll('.option');
+
+      buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === q.answer) btn.classList.add('correct');
+        else if (i === index) btn.classList.add('wrong');
+      });
+
+      const expl = document.getElementById('explanation');
+      expl.textContent = "💡 " + q.explanation;
+      expl.classList.remove('hidden');
+
+      if (index === q.answer) {
+        score++;
+        streak++;
+        maxStreak = Math.max(maxStreak, streak);
+        if (streak >= 3) {
+          bonus++;
+        }
+      } else {
+        streak = 0;
+      }
+
+      document.getElementById('live-score').textContent = score + bonus;
+      document.getElementById('live-streak').textContent = streak;
+      document.getElementById('next-btn').classList.remove('hidden');
+      document.getElementById('progress').style.width = `${((currentIndex + 1) / currentQuestions.length) * 100}%`;
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= currentQuestions.length) {
+        showResult();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showResult() {
+      const totalPossible = currentQuestions.length + bonus;
+      const percent = Math.round((score / currentQuestions.length) * 100);
+      let verdict = "";
+      let color = "";
+
+      if (percent === 100) {
+        verdict = "Неймовірно! Ви справжній мовознавець! 🏆";
+        color = "var(--green)";
+      } else if (percent >= 80) {
+        verdict = "Відмінний результат! Ви добре знаєте мову!";
+        color = "var(--green)";
+      } else if (percent >= 60) {
+        verdict = "Добрий рівень. Є куди рости!";
+        color = "var(--yellow)";
+      } else if (percent >= 40) {
+        verdict = "Непогано, але варто підтягнути знання.";
+        color = "var(--yellow)";
+      } else {
+        verdict = "Спробуйте ще раз — практика робить майстра!";
+        color = "var(--red)";
+      }
+
+      document.getElementById('result-content').innerHTML = `
+        <p><strong>Категорія:</strong> ${categoryName}</p>
+        <p style="margin:12px 0;"><strong>Правильних відповідей:</strong> ${score} з ${currentQuestions.length} (${percent}%)</p>
+        <p><strong>Бонуси за серії:</strong> +${bonus}</p>
+        <p><strong>Максимальна серія:</strong> ${maxStreak}</p>
+        <p style="margin:16px 0; font-size:1.3rem;"><strong>Загальний рахунок:</strong> <span style="color:var(--yellow)">${score + bonus}</span></p>
+        <div class="result-verdict" style="background:rgba(255,255,255,0.05); color:${color}">${verdict}</div>
+      `;
+      document.getElementById('player-name').value = '';
+      showScreen('result');
+    }
+
+    function saveScore() {
+      const name = document.getElementById('player-name').value.trim() || "Гравець";
+      const scores = JSON.parse(localStorage.getItem('movogray_scores') || '[]');
+      scores.push({
+        name,
+        score: score + bonus,
+        total: currentQuestions.length,
+        percent: Math.round((score / currentQuestions.length) * 100),
+        category: categoryName,
+        date: new Date().toLocaleDateString('uk-UA')
+      });
+      scores.sort((a, b) => b.percent - a.percent || b.score - a.score);
+      localStorage.setItem('movogray_scores', JSON.stringify(scores.slice(0, 15)));
+      alert('Результат збережено!');
+      showScreen('menu');
+    }
+
+    function showHighscores() {
+      const scores = JSON.parse(localStorage.getItem('movogray_scores') || '[]');
+      const container = document.getElementById('scores-table');
+      if (scores.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#888;">Поки що немає збережених результатів.<br>Будьте першим!</p>';
+      } else {
+        let html = '<table><thead><tr><th>#</th><th>Гравець</th><th>Бали</th><th>%</th><th>Категорія</th></tr></thead><tbody>';
+        scores.forEach((s, i) => {
+          html += `<tr>
+            <td>${i + 1}</td>
+            <td>${s.name}</td>
+            <td>${s.score}/${s.total}</td>
+            <td>${s.percent}%</td>
+            <td>${s.category}</td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+      showScreen('scores');
+    }
+
+    function clearScores() {
+      if (confirm('Очистити всі рекорди?')) {
+        localStorage.removeItem('movogray_scores');
+        showHighscores();
+      }
+    }
+
+    function showRules() { showScreen('rules'); }
+    function showAbout() { showScreen('about'); }
+  </script>
+</body>
+</html>
